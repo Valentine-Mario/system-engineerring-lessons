@@ -15,6 +15,7 @@ pub fn deconstruct_f32(n: f32) -> (u32, u32, u32) {
     //convert to a u32 so as to optimally perform bitwise manipulation on num
     let n_: u32 = unsafe { std::mem::transmute(n) };
     //strip 31 unwanted bits away (since it is an f32) by shifting them into nowhere, leaving only the signed bit
+    //add 31 0's at the start
     let sign = (n_ >> 31) & 1;
     //filter out the top bit (0xff is 255) with a logical AND mask, then strip 23 unwanted bits away
     //Only non-zero bits in the mask can pass through.

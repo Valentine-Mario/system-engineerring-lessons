@@ -1,6 +1,8 @@
+mod base_64_encoding;
 mod cpu;
 mod float_type;
 
+use crate::base_64_encoding::*;
 use crate::cpu::*;
 use crate::float_type::*;
 
@@ -219,4 +221,9 @@ fn main() {
     cpu.run();
 
     println!("7 + (10 * 2) + (10 * 2) = {}", cpu.register[0]);
+
+    let encoded = encode("peace master".as_bytes());
+    println!("peace master encoded {}", &encoded);
+    let decoded=decode(&encoded).unwrap();
+    println!("decoded value {:?}", std::str::from_utf8(&decoded).unwrap())
 }
