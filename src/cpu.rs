@@ -4,10 +4,13 @@ pub struct CPU {
     pub position_in_memory: usize,
     //the emulator has 4kb of memory, the first 512 bytes are reserved for thr system
     pub memory: [u8; 4096],
+    //stack max height is 16
+    pub stack: [u16; 16],
+    pub stack_pointer: usize,
 }
 
 impl CPU {
-    pub fn read_opcode(&self) -> u16 {
+    fn read_opcode(&self) -> u16 {
         let p = self.position_in_memory;
         let op_byte1 = self.memory[p] as u16;
         let op_byte2 = self.memory[p + 1] as u16;
@@ -33,6 +36,7 @@ impl CPU {
             //filter fourth bit 0X000F and move bits to owest significant place
             let d = ((opcode & 0x000F) >> 0) as u8;
 
+            let nnn = opcode & 0x0FFF;
             println!("nibbles c-{:?} x-{:?} y-{:?} d-{:?} ", c, x, y, d);
 
             match (c, x, y, d) {
@@ -40,13 +44,15 @@ impl CPU {
                 (0, 0, 0, 0) => {
                     return;
                 }
+                (0, 0, 0xE, 0xE) => self.ret(),
+                (0x2, _, _, _) => self.call(nnn),
                 (0x8, _, _, 0x4) => self.add_xy(x, y),
                 _ => todo!("opcode {:04x}", opcode),
             }
         }
     }
 
-    pub fn add_xy(&mut self, x: u8, y: u8) {
+    fn add_xy(&mut self, x: u8, y: u8) {
         let arg1 = self.register[x as usize];
         let arg2 = self.register[y as usize];
 
@@ -61,5 +67,29 @@ impl CPU {
         } else {
             self.register[0xF] = 0;
         }
+    }
+
+    fn call(&mut self, addr: u16) {
+        let sp = self.stack_pointer;
+        let stack = &mut self.stack;
+
+        if sp > stack.len() {
+            panic!("Stack overflow")
+        }
+        //add the current position in memory to the stack
+        stack[sp] = self.position_in_memory as u16;
+        //increment stack pointer. This would prevent position in memory from being overwritten
+        self.stack_pointer += 1;
+        //modify position in memory
+        self.position_in_memory = addr as usize;
+    }
+
+    fn ret(&mut self) {
+        if self.stack_pointer == 0 {
+            panic!("Stack overflow");
+        }
+        self.stack_pointer -= 1;
+        //jump to the positionn in memory where an earlier call was used
+        self.position_in_memory = self.stack[self.stack_pointer] as usize
     }
 }

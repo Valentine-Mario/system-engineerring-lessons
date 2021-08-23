@@ -159,37 +159,64 @@ fn main() {
         register: [0; 16],
         memory: [0; 4096],
         position_in_memory: 0,
+        stack: [0; 16],
+        stack_pointer: 0,
     };
-    cpu.register[0] = 5;
+    // cpu.register[0] = 5;
+    // cpu.register[1] = 10;
+    // cpu.register[2] = 10;
+    // cpu.register[3] = 10;
+    // cpu.register[4] = 30;
+
+    // //Load the opcode 0x8014 to memory. 0x8014 means “add the value in register 1 to register 0”
+    // //op_byte1
+    // cpu.memory[0] = 0x80;
+    // //op_byte2
+    // cpu.memory[1] = 0x14;
+
+    // //Load the opcode 0x8024 to memory, whuch means “add the value in register 2 to register 0”
+    // //op_byte1
+    // cpu.memory[2] = 0x80;
+    // //op_byte2
+    // cpu.memory[3] = 0x24;
+
+    // //Load the opcode 0x8034 to memory, whuch means “add the value in register 3 to register 0”
+    // //op_byte1
+    // cpu.memory[4] = 0x80;
+    // //op_byte2
+    // cpu.memory[5] = 0x34;
+
+    // //Load the opcode 0x8044 to memory, whuch means “add the value in register 4 to register 0”
+    // //op_byte1
+    // cpu.memory[6] = 0x80;
+    // //op_byte2
+    // cpu.memory[7] = 0x44;
+    // cpu.run();
+    // assert_eq!(cpu.register[0], 65);
+    // println!("5 + 10 + 10 + 10 + 30 = {}", cpu.register[0]);
+    cpu.register[0] = 7;
     cpu.register[1] = 10;
-    cpu.register[2] = 10;
-    cpu.register[3] = 10;
-    cpu.register[4] = 30;
 
-    //Load the opcode 0x8014 to memory. 0x8014 means “add the value in register 1 to register 0”
-    //op_byte1
-    cpu.memory[0] = 0x80;
-    //op_byte2
-    cpu.memory[1] = 0x14;
+    //Opcode 0x2100: CALL the function at 0x100
+    cpu.memory[0x000] = 0x21;
+    cpu.memory[0x001] = 0x00;
 
-    //Load the opcode 0x8024 to memory, whuch means “add the value in register 2 to register 0”
-    //op_byte1
-    cpu.memory[2] = 0x80;
-    //op_byte2
-    cpu.memory[3] = 0x24;
+    //Opcode 0x2100: CALL the function at 0x100
+    cpu.memory[0x002] = 0x21;
+    cpu.memory[0x003] = 0x00;
 
-    //Load the opcode 0x8034 to memory, whuch means “add the value in register 3 to register 0”
-    //op_byte1
-    cpu.memory[4] = 0x80;
-    //op_byte2
-    cpu.memory[5] = 0x34;
+    //Add register 1 value to register 0
+    cpu.memory[0x100] = 0x80;
+    cpu.memory[0x101] = 0x14;
 
-    //Load the opcode 0x8044 to memory, whuch means “add the value in register 4 to register 0”
-    //op_byte1
-    cpu.memory[6] = 0x80;
-    //op_byte2
-    cpu.memory[7] = 0x44;
+    //Add register 1 value to register 0
+    cpu.memory[0x102] = 0x80;
+    cpu.memory[0x103] = 0x14;
+
+    //opcode 0x00EE return
+    cpu.memory[0x104] = 0x00;
+    cpu.memory[0x105] = 0xEE;
     cpu.run();
-    assert_eq!(cpu.register[0], 65);
-    println!("5 + 10 + 10 + 10 + 30 = {}", cpu.register[0]);
+
+    println!("7 + (10 * 2) + (10 * 2) = {}", cpu.register[0]);
 }
